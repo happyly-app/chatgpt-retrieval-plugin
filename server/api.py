@@ -12,13 +12,14 @@ from models.api import (
     UpsertRequest,
     UpsertResponse,
 )
-from datastore.factory import get_datastore
+from datastore.providers.pinecone_datastore import PineconeDataStore
 from services.file import get_document_from_file
 
 from models.models import DocumentMetadata, Source
 
 bearer_scheme = HTTPBearer()
 BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
+datastore = PineconeDataStore()
 assert BEARER_TOKEN is not None
 
 
@@ -142,9 +143,3 @@ async def delete(
     except Exception as e:
         print("Error:", e)
         raise HTTPException(status_code=500, detail="Internal Service Error")
-
-
-@app.on_event("startup")
-async def startup():
-    global datastore
-    datastore = await get_datastore()
