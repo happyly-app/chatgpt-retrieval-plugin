@@ -1,6 +1,5 @@
 import os
 from typing import Optional
-import uvicorn
 from fastapi import FastAPI, File, Form, HTTPException, Depends, Body, UploadFile
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.staticfiles import StaticFiles
@@ -149,7 +148,3 @@ async def delete(
 async def startup():
     global datastore
     datastore = await get_datastore()
-
-
-def start():
-    uvicorn.run("server.main:app", host="0.0.0.0", port=8000, reload=True)
