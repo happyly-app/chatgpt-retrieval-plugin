@@ -4,6 +4,10 @@ import os
 
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 
+OPENAI_ORGANIZATION_ID =  os.environ.get("OPENAI_ORGANIZATION_ID")
+assert OPENAI_ORGANIZATION_ID is not None
+
+openai.organization = OPENAI_ORGANIZATION_ID
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(3))
 def get_embeddings(texts: List[str]) -> List[List[float]]:
