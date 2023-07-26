@@ -229,15 +229,26 @@ class PineconeDataStore(DataStore):
         # For start_date and end_date, uses the $gte and $lte operators respectively
         # For other fields, uses the $eq operator
         for field, value in filter.dict().items():
-            if value is not None:
-                if field == "start_date":
-                    pinecone_filter["date"] = pinecone_filter.get("date", {})
-                    pinecone_filter["date"]["$gte"] = to_unix_timestamp(value)
-                elif field == "end_date":
-                    pinecone_filter["date"] = pinecone_filter.get("date", {})
-                    pinecone_filter["date"]["$lte"] = to_unix_timestamp(value)
-                else:
-                    pinecone_filter[field] = value
+            if value is None:
+                continue
+
+            if field == "start_date":
+                pinecone_filter["date"] = pinecone_filter.get("date", {})
+                pinecone_filter["date"]["$gte"] = to_unix_timestamp(value)
+                continue
+
+            if field == "end_date":
+                pinecone_filter["date"] = pinecone_filter.get("date", {})
+                pinecone_filter["date"]["$lte"] = to_unix_timestamp(value)
+                continue
+
+            if "[[in]]:" in value:
+                value = value.replace("[[in]]:","")
+                value = {"$in": value.split(";;")}
+
+            pinecone_filter[field] = value
+
+        return pinecone_filter
 
         return pinecone_filter
 
