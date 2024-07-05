@@ -28,7 +28,7 @@ multidict = "==6.0.4"
 numpy = "==1.24.3"
 openai = "==0.27.6"
 pillow = "==9.5.0"
-pinecone-client = "==2.2.1"
+pinecone-client = "==4.1.2"
 pycryptodomex = "==3.17"
 pydantic = "==1.10.7"
 pypdf2 = "==3.0.1"
@@ -51,6 +51,7 @@ uvicorn = "==0.20.0"
 win32-setctime = "==1.1.0"
 xlsxwriter = "==3.1.0"
 yarl = "==1.9.2"
+pinecone-plugin-interface = "==0.0.7"
 
 [dev-packages]
 
