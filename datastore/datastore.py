@@ -24,7 +24,7 @@ class DataStore(ABC):
         Return a list of document ids.
         """
         # Delete any existing vectors for documents with the input document ids
-        await asyncio.gather(
+        """ await asyncio.gather(
             *[
                 self.delete(
                     filter=DocumentMetadataFilter(
@@ -35,7 +35,7 @@ class DataStore(ABC):
                 for document in documents
                 if document.id
             ]
-        )
+        ) """
 
         chunks = get_document_chunks(documents, chunk_token_size)
 
