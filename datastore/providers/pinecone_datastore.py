@@ -20,9 +20,11 @@ from services.date import to_unix_timestamp
 PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
 PINECONE_ENVIRONMENT = os.environ.get("PINECONE_ENVIRONMENT")
 PINECONE_INDEX = os.environ.get("PINECONE_INDEX")
+PINECONE_NAMESPACE = os.environ.get("PINECONE_NAMESPACE")
 assert PINECONE_API_KEY is not None
 assert PINECONE_ENVIRONMENT is not None
 assert PINECONE_INDEX is not None
+assert PINECONE_NAMESPACE is not None
 
 # Initialize Pinecone with the API key and environment
 pc = Pinecone(api_key=PINECONE_API_KEY)
@@ -101,9 +103,7 @@ class PineconeDataStore(DataStore):
         for batch in batches:
             try:
                 print(f"Upserting batch of size {len(batch)}")
-                self.index.upsert(
-                    vectors=batch,
-                )
+                self.index.upsert(vectors=batch, namespace=PINECONE_NAMESPACE)
                 print(f"Upserted batch successfully")
             except Exception as e:
                 print(f"Error upserting batch: {e}")
@@ -130,7 +130,7 @@ class PineconeDataStore(DataStore):
             try:
                 # Query the index with the query embedding, filter, and top_k
                 query_response = self.index.query(
-                    # namespace=namespace,
+                    namespace=PINECONE_NAMESPACE,
                     top_k=query.top_k,
                     vector=query.embedding,
                     filter=pinecone_filter,
@@ -190,7 +190,7 @@ class PineconeDataStore(DataStore):
         if delete_all:
             try:
                 print(f"Deleting all vectors from index")
-                self.index.delete(delete_all=True)
+                self.index.delete(delete_all=True, namespace=PINECONE_NAMESPACE)
                 print(f"Deleted all vectors successfully")
                 return True
             except Exception as e:
@@ -203,7 +203,7 @@ class PineconeDataStore(DataStore):
         if pinecone_filter != {}:
             try:
                 print(f"Deleting vectors with filter {pinecone_filter}")
-                self.index.delete(filter=pinecone_filter)
+                self.index.delete(filter=pinecone_filter, namespace=PINECONE_NAMESPACE)
                 print(f"Deleted vectors with filter successfully")
             except Exception as e:
                 print(f"Error deleting vectors with filter: {e}")
@@ -214,7 +214,7 @@ class PineconeDataStore(DataStore):
             try:
                 print(f"Deleting vectors with ids {ids}")
                 pinecone_filter = {"document_id": {"$in": ids}}
-                self.index.delete(filter=pinecone_filter)  # type: ignore
+                self.index.delete(filter=pinecone_filter, namespace=PINECONE_NAMESPACE)  # type: ignore
                 print(f"Deleted vectors with ids successfully")
             except Exception as e:
                 print(f"Error deleting vectors with ids: {e}")
