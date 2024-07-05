@@ -34,7 +34,7 @@ UPSERT_BATCH_SIZE = 100
 class PineconeDataStore(DataStore):
     def __init__(self):
         # Check if the index name is specified and exists in Pinecone
-        if PINECONE_INDEX and PINECONE_INDEX not in pc.list_indexes():
+        if PINECONE_INDEX and PINECONE_INDEX not in pc.list_indexes().names():
 
             # Get all fields in the metadata object in a list
             fields_to_index = list(DocumentChunkMetadata.__fields__.keys())
@@ -50,16 +50,18 @@ class PineconeDataStore(DataStore):
                     metric="cosine",
                     spec=ServerlessSpec(cloud="aws", region="us-east-1"),
                 )
-                self.index = pc.Index(PINECONE_INDEX)
+                host = pc.describe_index(PINECONE_INDEX).host
+                self.index = pc.Index(host=host)
                 print(f"Index {PINECONE_INDEX} created successfully")
             except Exception as e:
                 print(f"Error creating index {PINECONE_INDEX}: {e}")
                 raise e
-        elif PINECONE_INDEX and PINECONE_INDEX in pc.list_indexes():
+        elif PINECONE_INDEX and PINECONE_INDEX in pc.list_indexes().names():
             # Connect to an existing index with the specified name
             try:
                 print(f"Connecting to existing index {PINECONE_INDEX}")
-                self.index = pc.Index(PINECONE_INDEX)
+                host = pc.describe_index(PINECONE_INDEX).host
+                self.index = pc.Index(host=host)
                 print(f"Connected to index {PINECONE_INDEX} successfully")
             except Exception as e:
                 print(f"Error connecting to index {PINECONE_INDEX}: {e}")
@@ -99,7 +101,9 @@ class PineconeDataStore(DataStore):
         for batch in batches:
             try:
                 print(f"Upserting batch of size {len(batch)}")
-                self.index.upsert(vectors=batch)
+                self.index.upsert(
+                    vectors=batch,
+                )
                 print(f"Upserted batch successfully")
             except Exception as e:
                 print(f"Error upserting batch: {e}")
